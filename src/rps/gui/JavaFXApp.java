@@ -7,9 +7,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
-// project import
-import rps.bll.game.*;
-import rps.bll.player.*;
+
 
 /**
  * JavaFX implementation of the RPS game

@@ -7,6 +7,7 @@ import rps.bll.game.Result;
 
 //Java imports
 import java.util.ArrayList;
+import java.util.Random;
 
 /**
  * Example implementation of a player.
@@ -26,6 +27,8 @@ public class Player implements IPlayer {
         this.type = type;
     }
 
+    public Player() {
+    }
 
     @Override
     public String getPlayerName() {
@@ -49,7 +52,22 @@ public class Player implements IPlayer {
         //Historic data to analyze and decide next move...
         ArrayList<Result> results = (ArrayList<Result>) state.getHistoricResults();
 
-        //Implement better AI here...
+        // AI with only 1 move
         return Move.Rock;
+
+
+        // Ai with Random Move
+        /*
+        ArrayList<Move> AIMove = new ArrayList<>();
+        AIMove.add(Move.Rock);
+        AIMove.add(Move.Paper);
+        AIMove.add(Move.Scissor);
+
+        int Random = new Random().nextInt(AIMove.size());
+        return AIMove.get(Random);
+
+        */
+
+
     }
 }
