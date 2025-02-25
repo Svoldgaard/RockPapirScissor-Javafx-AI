@@ -20,4 +20,5 @@
    <ImageView fx:id="imageViewAI" fitHeight="150.0" fitWidth="200.0" layoutX="325.0" layoutY="235.0" pickOnBounds="true" preserveRatio="true" />
    <Label fx:id="lblBotName" layoutX="349.0" layoutY="218.0" text="Label" />
    <Label fx:id="lblMakeYourMove" layoutX="148.0" layoutY="218.0" text="Label" />
+   <Label fx:id="lblRoundNumber" layoutX="89.0" layoutY="34.0" text="Label" />
 </AnchorPane>

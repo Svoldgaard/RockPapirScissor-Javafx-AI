@@ -24,7 +24,10 @@ import rps.bll.player.*;
  */
 public class GameViewController implements Initializable {
 
-    public Label lblMakeYourMove;
+    @FXML
+    private Label lblMakeYourMove;
+    @FXML
+    public Label lblRoundNumber;
     @FXML
     private Label lblBotName;
     @FXML
@@ -34,12 +37,12 @@ public class GameViewController implements Initializable {
     @FXML
     private ImageView imageViewAI;
 
-    
+    private GameState gameState;
 
 
 
     public GameViewController() {
-
+        gameState = new GameState();
     }
 
 
@@ -53,6 +56,7 @@ public class GameViewController implements Initializable {
         lblText.setText("Welcome to RPS Game!");
         lblBotName.setText("Bot Name: " + getRandomBotName());
         lblMakeYourMove.setText("Make Your Move");
+        lblRoundNumber.setText("Round:" + gameState.getRoundNumber());
 
         // ImageView's
         imageViewPlayer.setImage(new Image(Objects.requireNonNull(getClass().getResourceAsStream("/rps/Image/rock-paper-scissors.png"))));
