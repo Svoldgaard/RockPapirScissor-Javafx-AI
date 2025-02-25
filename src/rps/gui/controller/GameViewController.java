@@ -5,29 +5,30 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextArea;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Objects;
 import java.util.Random;
 import java.util.ResourceBundle;
 
-// project import
+// Project imports
 import rps.bll.game.*;
 import rps.bll.player.*;
 
 /**
- *
+ * JavaFX Controller for the Rock-Paper-Scissors game
  * @author smsj
  */
 public class GameViewController implements Initializable {
 
     @FXML
+    private TextArea textAreaResulte;
+    @FXML
     private Label lblMakeYourMove;
     @FXML
-    public Label lblRoundNumber;
+    private Label lblRoundNumber;
     @FXML
     private Label lblBotName;
     @FXML
@@ -37,85 +38,101 @@ public class GameViewController implements Initializable {
     @FXML
     private ImageView imageViewAI;
 
-    private GameState gameState;
+    private IPlayer human;
+    private IPlayer bot;
+    private GameManager gameManager;
 
-
-
-    public GameViewController() {
-        gameState = new GameState();
-    }
-
-
-    /**
-     * Initializes the controller class.
-     */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
+        String botName = getRandomBotName();
 
-        // Label
         lblText.setText("Welcome to RPS Game!");
-        lblBotName.setText("Bot Name: " + getRandomBotName());
-        lblMakeYourMove.setText("Make Your Move");
-        lblRoundNumber.setText("Round:" + gameState.getRoundNumber());
+        lblBotName.setText("Bot Name: " + botName);
+        lblMakeYourMove.setText("Make Your Move:");
+        textAreaResulte.setText("Game started! Select Rock, Paper, or Scissors.");
 
-        // ImageView's
-        imageViewPlayer.setImage(new Image(Objects.requireNonNull(getClass().getResourceAsStream("/rps/Image/rock-paper-scissors.png"))));
-        imageViewAI.setImage(new Image(Objects.requireNonNull(getClass().getResourceAsStream("/rps/Image/rock-paper-scissors.png"))));
+        // Initialize game manager
+        human = new Player("Player", PlayerType.Human);
+        bot = new Player(botName, PlayerType.AI);
+        gameManager = new GameManager(human, bot);
+    }
 
+    /**
+     * Plays a round based on player's move
+     * @param playerMove The move selected by the player
+     */
+    private void playRound(Move playerMove) {
+        gameManager.playRound(playerMove);
+        GameState gameState = (GameState) gameManager.getGameState();
+        Result lastResult = gameState.getHistoricResults().get(gameState.getHistoricResults().size() - 1);
+
+        // Update images
+        updateMoveImages(playerMove, lastResult.getLoserMove());
+
+        // Update UI
+        textAreaResulte.appendText("\n" + getResultAsString(lastResult));
+        lblRoundNumber.setText("Round: " + gameState.getRoundNumber());
+    }
+
+    /**
+     * Updates the images based on player and AI move
+     */
+    private void updateMoveImages(Move playerMove, Move aiMove) {
+        imageViewPlayer.setImage(getMoveImage(playerMove));
+        imageViewAI.setImage(getMoveImage(aiMove));
+    }
+
+    /**
+     * Returns the corresponding image for the move
+     */
+    private Image getMoveImage(Move move) {
+        String fileName = switch (move) {
+            case Rock -> "rock.png";
+            case Paper -> "hand-paper.png";
+            case Scissor -> "Scissors.png";
+        };
+        return new Image(Objects.requireNonNull(getClass().getResourceAsStream("/rps/Image/" + fileName)));
     }
 
     @FXML
     private void btnRock(ActionEvent actionEvent) {
-
-        imageViewPlayer.setImage(new Image(Objects.requireNonNull(getClass().getResourceAsStream("/rps/Image/rock.png"))));
-
+        playRound(Move.Rock);
     }
 
     @FXML
     private void btnPapir(ActionEvent actionEvent) {
-        imageViewPlayer.setImage(new Image(Objects.requireNonNull(getClass().getResourceAsStream("/rps/Image/hand-paper.png"))));
-
+        playRound(Move.Paper);
     }
 
     @FXML
     private void btnScissor(ActionEvent actionEvent) {
-        imageViewPlayer.setImage(new Image(Objects.requireNonNull(getClass().getResourceAsStream("/rps/Image/Scissors.png"))));
+        playRound(Move.Scissor);
     }
 
     @FXML
     private void btnRandomMove(ActionEvent actionEvent) {
-        ArrayList<Move> randomMove = new ArrayList<>();
-        randomMove.add(Move.Rock);
-        randomMove.add(Move.Paper);
-        randomMove.add(Move.Scissor);
-
-
-        Move selectedMove = randomMove.get(new Random().nextInt(randomMove.size()));
-
-        if (selectedMove == Move.Paper) {
-            imageViewPlayer.setImage(new Image(Objects.requireNonNull(getClass().getResourceAsStream("/rps/Image/hand-paper.png"))));
-        }
-        else if (selectedMove == Move.Scissor) {
-            imageViewPlayer.setImage(new Image(Objects.requireNonNull(getClass().getResourceAsStream("/rps/Image/Scissors.png"))));
-        }
-        else if (selectedMove == Move.Rock) {
-            imageViewPlayer.setImage(new Image(Objects.requireNonNull(getClass().getResourceAsStream("/rps/Image/rock.png"))));
-        }
+        Move[] moves = Move.values();
+        Move randomMove = moves[new Random().nextInt(moves.length)];
+        playRound(randomMove);
     }
 
-
     private String getRandomBotName() {
-        String[] botNames = new String[] {
-                "R2D2",
-                "Mr. Data",
-                "3PO",
-                "Bender",
-                "Marvin the Paranoid Android",
-                "Bishop",
-                "Robot B-9",
-                "HAL"
+        String[] botNames = { "R2D2", "Mr. Data", "3PO", "Bender", "Marvin", "Bishop", "Robot B-9", "HAL" };
+        return botNames[new Random().nextInt(botNames.length)];
+    }
+
+    private String getResultAsString(Result result) {
+        String statusText = switch (result.getType()) {
+            case Win -> " wins against ";
+            case Tie -> " ties with ";
+
         };
-        int randomNumber = new Random().nextInt(botNames.length - 1);
-        return botNames[randomNumber];
+
+        return "Round #" + result.getRoundNumber() + ": " +
+                result.getWinnerPlayer().getPlayerName() +
+                " (" + result.getWinnerMove() + ")" +
+                statusText +
+                result.getLoserPlayer().getPlayerName() +
+                " (" + result.getLoserMove() + ")!";
     }
 }

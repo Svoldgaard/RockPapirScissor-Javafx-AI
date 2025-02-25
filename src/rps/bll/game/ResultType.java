@@ -7,5 +7,6 @@ package rps.bll.game;
  */
 public enum ResultType {
     Win,
-    Tie
+    Tie,
+
 }
