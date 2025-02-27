@@ -1,6 +1,7 @@
 package rps.bll.player;
 
 //Project imports
+import rps.bll.AI.MarkovAI;
 import rps.bll.game.IGameState;
 import rps.bll.game.Move;
 import rps.bll.game.Result;
@@ -19,16 +20,16 @@ public class Player implements IPlayer {
     private String name;
     private PlayerType type;
 
+    private MarkovAI markovAI;
     /**
      * @param name
      */
     public Player(String name, PlayerType type) {
         this.name = name;
         this.type = type;
+        markovAI = new MarkovAI();
     }
 
-    public Player() {
-    }
 
     @Override
     public String getPlayerName() {
@@ -53,7 +54,7 @@ public class Player implements IPlayer {
         ArrayList<Result> results = (ArrayList<Result>) state.getHistoricResults();
 
         // AI with only 1 move
-        return Move.Rock;
+        //return Move.Rock;
 
 
         // Ai with Random Move
@@ -65,8 +66,32 @@ public class Player implements IPlayer {
 
         int Random = new Random().nextInt(AIMove.size());
         return AIMove.get(Random);
-
         */
+
+        // MarkovAI
+        if (results.isEmpty()) {
+            return Move.values()[new Random().nextInt(3)]; // Start randomly
+        }
+        
+        Result lastResult = results.get(results.size() - 1);
+
+        // Determine the opponent's move
+        Move lastOpponentMove;
+
+        if (lastResult.getWinnerPlayer() == this) {
+            lastOpponentMove = lastResult.getLoserMove();  // Bot won, opponent lost
+        } else if (lastResult.getLoserPlayer() == this) {
+            lastOpponentMove = lastResult.getWinnerMove(); // Bot lost, opponent won
+        } else {
+            lastOpponentMove = lastResult.getWinnerMove(); // Handle ties (assuming one move is recorded)
+        }
+
+        // Update Markov AI
+        MarkovAI.updateMatrix(lastOpponentMove);
+
+        // Predict next move
+        return markovAI.predictNextMove();
+
 
 
     }

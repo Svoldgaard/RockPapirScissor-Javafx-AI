@@ -24,6 +24,10 @@ import rps.bll.player.*;
 public class GameViewController implements Initializable {
 
     @FXML
+    private Label lblPlayerPoints;
+    @FXML
+    private Label lblAIPoints;
+    @FXML
     private TextArea textAreaResulte;
     @FXML
     private Label lblMakeYourMove;
@@ -46,10 +50,16 @@ public class GameViewController implements Initializable {
     public void initialize(URL url, ResourceBundle rb) {
         String botName = getRandomBotName();
 
+        lblRoundNumber.setText("First Round");
         lblText.setText("Welcome to RPS Game!");
         lblBotName.setText("Bot Name: " + botName);
         lblMakeYourMove.setText("Make Your Move:");
         textAreaResulte.setText("Game started! Select Rock, Paper, or Scissors.");
+
+
+        // this is not implemented yet
+        lblPlayerPoints.setText("Player games won: ");
+        lblAIPoints.setText("AI games won: ");
 
         // Initialize game manager
         human = new Player("Player", PlayerType.Human);

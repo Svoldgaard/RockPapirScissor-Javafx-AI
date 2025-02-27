@@ -58,4 +58,6 @@ public class Result {
     public ResultType getType() {
         return type;
     }
+
+
 }
